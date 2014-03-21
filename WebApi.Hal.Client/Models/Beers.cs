@@ -24,7 +24,7 @@ namespace WebApi.Hal.Client
             builder.AppendFormat("Page: '{0}'\n", Page);
             foreach (var beer in ResourceList)
             {
-                builder.AppendFormat("-Beer: '{0}'\n", beer);
+                builder.AppendFormat("-Beer: '{0}'\n", beer.Name);
             }
             
             //No To String Yet

@@ -13,22 +13,47 @@ namespace WebApi.Hal.Client
     {
         static void Main(string[] args)
         {
-            var beers = ParseStuff<Beers>("http://localhost:51665/", "Beers");           
-            Console.WriteLine("Beers: '{0}'\n\n", beers.ToString());
+            var baseURL = "http://localhost:51665/";
+            BaseBeer beers = ParseStuff<Beers>(baseURL, "Beers");           
+            Console.WriteLine("Beers: '{0}'\n\n", beers);
 
             while (true)
             {
-                DisplayStuff(beers);
-                beers = ParseStuff<Beers>("http://localhost:51665/", beers._links
-                                                                .Single(p => p.Rel == "next")
-                                                                .Href
-                                                                .Trim('~'));
+                var links = DisplayStuff(beers);
+                var selected = Console.ReadLine();
+                int selectedIndex = 0;
 
-                Console.WriteLine("Beers: '{0}'\n\n", beers);
+                Console.Clear();
+                if(int.TryParse(selected, out selectedIndex) && selectedIndex > -1 && selectedIndex < links.Count)
+                {
+                    if (links[selectedIndex].Href.ToLower().Contains("beers"))
+                    {
+                        beers = ParseStuff<Beers>(baseURL, links[selectedIndex].Href.Trim('~'));
+                        Console.WriteLine("Beers: '{0}'\n\n", beers);
+                    }
+                    else if (links[selectedIndex].Href.ToLower().Contains("beer"))
+                    {
+                        beers = ParseStuff<Beer>(baseURL, links[selectedIndex].Href.Trim('~'));
+                        Console.WriteLine("Beer: '{0}'\n\n", beers);
+                    }
+                    else if (links[selectedIndex].Href.ToLower().Contains("review"))
+                    {
+                        beers = ParseStuff<Review>(baseURL, links[selectedIndex].Href.Trim('~'));
+                        Console.WriteLine("Review: '{0}'\n\n", beers);
+                    }
+                    else
+                    {
+                        beers = ParseStuff<BaseBeer>(baseURL, links[selectedIndex].Href.Trim('~'));
+                        Console.WriteLine("Data: '{0}'\n\n", beers);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Invalid Number, Please Try Again.");
+                    Console.WriteLine("Beers: '{0}'\n\n", beers);
+                }
             }
 
-            var beer = ParseStuff<Beer>("http://localhost:51665/", beers.ResourceList[0]._links[0].Href.Trim('~'));           
-            Console.WriteLine("Let's try the first: '{0}'", beer);
             Console.ReadKey();
         }
 
@@ -44,13 +69,16 @@ namespace WebApi.Hal.Client
                 index++;
             }
 
-            foreach(var thing in thingToDisplay.ResourceList)
+            if (thingToDisplay.ResourceList != null)
             {
-                foreach (var links in thing._links.Where(p => p.IsTemplated == false))
+                foreach (var thing in thingToDisplay.ResourceList)
                 {
-                    Console.WriteLine("Option {0}: Action: '{2}' Name: '{1}' Link: '{3}'", index, thing.Name, links.Rel, links.Href);
-                    result.Add(links);
-                    index++;
+                    foreach (var links in thing._links.Where(p => p.IsTemplated == false))
+                    {
+                        Console.WriteLine("Option {0}: Action: '{2}' Name: '{1}' Link: '{3}'", index, thing.Name, links.Rel, links.Href);
+                        result.Add(links);
+                        index++;
+                    }
                 }
             }
 

@@ -14,5 +14,10 @@ namespace WebApi.Hal.Client.Models
         public List<BaseBeer> ResourceList { get; set; }
 
         public Link[] _links { get; set; }
+
+        public override string ToString()
+        {
+            return string.Format("Id: {0} Name: {1}", Id, Name);
+        }
     }
 }
