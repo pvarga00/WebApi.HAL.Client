@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WebApi.Hal.Client.Models;
 
 namespace WebApi.Hal.Client
 {
-    public class Beers
+    public class Beers : BaseBeer
     {
         public int TotalResults { get; set; }
 
@@ -14,9 +15,6 @@ namespace WebApi.Hal.Client
 
         public int Page { get; set; }
         
-        public List<Beer> ResourceList { get; set; }
-
-        public Link[] _links { get; set; }
 
         public override string ToString()
         {
